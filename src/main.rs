@@ -1,6 +1,23 @@
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 
+use crate::{
+    assets::AssetsPlugin,
+    menu::MainMenuPlugin,
+};
+
+
+#[derive(
+    Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States,
+)]
+pub enum GameState {
+    #[default]
+    AssetLoading,
+    Menu,
+    ChooseShip,
+    Playing,
+}
+
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(
@@ -16,7 +33,11 @@ fn main() {
             }),
             PhysicsPlugins::default(),
             PhysicsDebugPlugin::default(),
+
+            AssetsPlugin,
+            UiPlugin,
         ))
+        .init_state::<GameState>()
         .add_systems(Startup, setup)
         .run();
 }
