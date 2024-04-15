@@ -1,11 +1,17 @@
-use super::MenuPage;
-use crate::{
-    assets::{AudioAssets, FontAssets, ImageAssets},
-    kenney_assets::KenneySpriteSheetAsset,
-    GameState,
-};
 use bevy::{
-    app::AppExit, ecs::system::Command, prelude::*,
+    app::AppExit, 
+    ecs::system::Command, 
+    prelude::*
+};
+
+use crate::{
+    utils::{
+        asset_loader::{AudioAssets, FontAssets, ImageAssets},
+        kenney_asset::KenneySpriteSheetAsset,
+    },
+    gameui::menu::MenuPage,
+    gameui::settings::{AudioSettings, GameSettings},
+    GameState,
 };
 
 const HOVERED_BUTTON: Color = Color::Hsla {

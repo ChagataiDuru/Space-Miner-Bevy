@@ -1,11 +1,17 @@
 use bevy::prelude::*;
+
 use crate::{
-    assets::{
-        AudioAssets, FontAssets,
+    utils::asset_loader::{
+        FontAssets,
         ImageAssets,
     },
     GameState,
 }; 
+
+use crate::gameui::button::SpawnButton;
+
+#[derive(Component)]
+pub struct MainMenu;
 
 #[derive(Resource, Component, Debug, PartialEq)]
 pub enum MenuPage {
@@ -13,13 +19,9 @@ pub enum MenuPage {
     Settings,
 }
 
-pub struct MainMenu;
-
-#[derive(Component)]
-struct MainMenu;
-
+pub struct MainMenuPlugin;
 impl Plugin for MainMenuPlugin {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.insert_resource(MenuPage::Main)
         .add_systems(
             OnExit(GameState::AssetLoading),
@@ -32,7 +34,7 @@ impl Plugin for MainMenuPlugin {
         .add_systems(
             OnExit(GameState::Menu), 
             hide_menu
-        )
+        );
     }
 }
 
@@ -153,42 +155,7 @@ pub fn main_menu(
                                 ..default()
                             },
                             ..default()
-                        })
-                        .with_children(|parent| {
-                            parent.spawn((
-                                ButtonBundle {
-                                    style: Style {
-                                        width: Val::Px(25.0),
-                                        height: Val::Px(25.0),
-                                        margin:
-                                            UiRect::right(
-                                                Val::Px(
-                                                    10.0,
-                                                ),
-                                            ),
-                                        ..default()
-                                    },
-                                    image: UiImage::new(
-                                        images
-                                            .box_checked
-                                            .clone(),
-                                    ),
-                                    ..default()
-                                },
-                                AudioSettingsCheckbox,
-                            ));
-                            parent.spawn(
-                                TextBundle::from_section(
-                                    "Play Audio",
-                                    TextStyle {
-                                        font:fonts.roboto.clone(),
-                                        font_size: 25.0,
-                                        color: colors::TEXT,
-                                    },
-                                ),
-                            );
                         });
-
                 });
         });
 }

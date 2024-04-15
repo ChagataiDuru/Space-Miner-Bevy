@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 
 use crate::{
-    kenney_assets::{
+    utils::kenney_asset::{
         KenneyAssetPlugin, KenneySpriteSheetAsset,
     },
     GameState,

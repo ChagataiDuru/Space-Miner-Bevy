@@ -1,10 +1,14 @@
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 
-use crate::{
-    assets::AssetsPlugin,
-    menu::MainMenuPlugin,
-};
+mod utils;
+use crate::utils::{
+    asset_loader::AssetsPlugin,
+    kenney_asset::KenneyAssetPlugin
+};   
+
+mod gameui;
+use crate::gameui::menu::MainMenuPlugin;
 
 
 #[derive(
@@ -35,7 +39,7 @@ fn main() {
             PhysicsDebugPlugin::default(),
 
             AssetsPlugin,
-            UiPlugin,
+            MainMenuPlugin,
         ))
         .init_state::<GameState>()
         .add_systems(Startup, setup)
