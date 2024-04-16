@@ -1,2 +1,2 @@
-mod spaceship;
-mod asteroid;
+pub mod spaceship;
+pub mod asteroid;

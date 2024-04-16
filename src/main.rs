@@ -4,11 +4,13 @@ use bevy_xpbd_2d::prelude::*;
 mod utils;
 mod gameui;
 mod movement;
+mod entities;
 use crate::{
     utils::asset_loader::AssetsPlugin,
     gameui::settings::SettingsPlugin,
     gameui::menu::MainMenuPlugin,
     movement::MovementPlugin,
+    entities::spaceship::ShipPlugin,
 };   
 
 #[derive(
@@ -44,6 +46,7 @@ fn main() {
             SettingsPlugin,
             MainMenuPlugin,
             MovementPlugin,
+            ShipPlugin,
         ))
         .init_state::<GameState>()
         .add_systems(Startup, setup)
