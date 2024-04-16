@@ -3,9 +3,12 @@ use bevy_xpbd_2d::prelude::*;
 
 mod utils;
 mod gameui;
-use crate::{utils::asset_loader::AssetsPlugin,
+mod movement;
+use crate::{
+    utils::asset_loader::AssetsPlugin,
     gameui::settings::SettingsPlugin,
     gameui::menu::MainMenuPlugin,
+    movement::MovementPlugin,
 };   
 
 #[derive(
@@ -17,6 +20,9 @@ pub enum GameState {
     Menu,
     Playing,
 }
+
+#[derive(Component)]
+pub struct Player;
 
 fn main() {
     App::new()
@@ -37,6 +43,7 @@ fn main() {
             AssetsPlugin,
             SettingsPlugin,
             MainMenuPlugin,
+            MovementPlugin,
         ))
         .init_state::<GameState>()
         .add_systems(Startup, setup)
