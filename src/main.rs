@@ -5,7 +5,7 @@ mod utils;
 mod gameui;
 use crate::{utils::asset_loader::AssetsPlugin,
     gameui::settings::SettingsPlugin,
-    gameui::menu::MainMenuPlugin
+    gameui::menu::MainMenuPlugin,
 };   
 
 #[derive(
@@ -15,7 +15,6 @@ pub enum GameState {
     #[default]
     AssetLoading,
     Menu,
-    ChooseShip,
     Playing,
 }
 

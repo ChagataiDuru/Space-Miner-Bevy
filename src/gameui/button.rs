@@ -36,6 +36,7 @@ pub struct TextButton;
 #[derive(Resource, Component, Debug, PartialEq)]
 pub enum MenuPage {
     Main,
+    Save,
     Settings,
 }
 
@@ -66,8 +67,7 @@ pub fn text_button_system(
                 *color = PRESSED_BUTTON.into();
                 match text.sections[0].value.as_str() {
                     "New Game" => {
-                        next_state
-                            .set(GameState::ChooseShip);
+                        *menu_page = MenuPage::Save;
                     }
                     "Settings" => {
                         *menu_page = MenuPage::Settings;
@@ -82,7 +82,28 @@ pub fn text_button_system(
                     }
                     "Play" => {
                         next_state
-                            .set(GameState::ChooseShip);
+                            .set(GameState::Playing);
+                    }
+                    "Slot1" => {
+                        if settings.audio == AudioSettings::ON {
+                            // commands.spawn(AudioBundle Game Audio
+                        }
+                        next_state
+                            .set(GameState::Playing);
+                    }
+                    "Slot2" => {
+                        if settings.audio == AudioSettings::ON {
+                            // commands.spawn(AudioBundle Game Audio
+                        }
+                        next_state
+                            .set(GameState::Playing);
+                    }
+                    "Slot3" => {
+                        if settings.audio == AudioSettings::ON {
+                            // commands.spawn(AudioBundle Game Audio
+                        }
+                        next_state
+                            .set(GameState::Playing);
                     }
                     _ => {
                         unimplemented!(

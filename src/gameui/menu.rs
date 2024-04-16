@@ -1,19 +1,15 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, render::render_resource::Texture};
 
 use crate::{
-    utils::asset_loader::{
-        FontAssets,
-        ImageAssets,
-        AudioAssets,
-    },
-    GameState,
+    gameui::{
+        button::{text_button_system, MenuPage, SpawnButton},settings::{AudioSettings, GameSettings},
+    }, 
+    utils::{
+    asset_loader::{AudioAssets, FontAssets, ImageAssets}, 
+    kenney_asset::KenneySpriteSheetAsset
+    }, 
+    GameState
 }; 
-
-use crate::gameui::{
-    button::SpawnButton,button::MenuPage, 
-    button::text_button_system,
-    settings::{AudioSettings, GameSettings},
-};
 
 #[derive(Component)]
 pub struct MainMenu;
@@ -70,7 +66,9 @@ pub fn main_menu(
     mut commands: Commands,
     images: Res<ImageAssets>,
     fonts: Res<FontAssets>,
+    sheets: Res<Assets<KenneySpriteSheetAsset>>,
 ) {
+    let space_sheet =sheets.get(&images.space_sheet).unwrap();
     commands
         .spawn((
             NodeBundle {
@@ -206,6 +204,46 @@ pub fn main_menu(
                         });
 
                 });
+            parent.spawn((
+                ImageBundle {
+                    image: images.panel_glass.clone().into(),
+                    visibility: Visibility::Hidden,
+                    style: Style {
+                        width: Val::Px(360.0),
+                        height: Val::Px(500.0),
+                        flex_direction:
+                            FlexDirection::Column,
+                        justify_content:
+                            JustifyContent::SpaceBetween,
+                        border: UiRect::all(Val::Px(
+                            10.0,
+                        )),
+                        ..default()
+                    },
+                    ..default()
+                },
+                ImageScaleMode::Sliced(panel_slicer.clone()),
+                MenuPage::Save,
+            ))
+            .with_children(|parent| {
+                let entity = parent.parent_entity();
+                parent.add_command(SpawnButton{
+                    parent: entity,
+                    text: "Back"
+                });
+                parent.add_command(SpawnButton{
+                    parent: entity,
+                    text: "Slot1"
+                });
+                parent.add_command(SpawnButton{
+                    parent: entity,
+                    text: "Slot2"
+                });
+                parent.add_command(SpawnButton{
+                    parent: entity,
+                    text: "Slot3"
+                });
+            });
         });
 }
 
