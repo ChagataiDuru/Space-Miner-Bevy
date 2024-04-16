@@ -6,10 +6,13 @@ use bevy::{
 
 use crate::{
     utils::{
-        asset_loader::{AudioAssets, FontAssets, ImageAssets},
+        asset_loader::{
+            AudioAssets,
+            FontAssets,
+            ImageAssets
+        },
         kenney_asset::KenneySpriteSheetAsset,
     },
-    gameui::menu::MenuPage,
     gameui::settings::{AudioSettings, GameSettings},
     GameState,
 };
@@ -30,13 +33,18 @@ const PRESSED_BUTTON: Color = Color::Hsla {
 #[derive(Component)]
 pub struct TextButton;
 
+#[derive(Resource, Component, Debug, PartialEq)]
+pub enum MenuPage {
+    Main,
+    Settings,
+}
+
+// This system taken from https://github.com/rust-adventure/asteroids/blob/yt-2024-04-01/src/ui/button.rs Thanks to https://github.com/ChristopherBiscardi
 pub fn text_button_system(
     mut commands: Commands,
     mut interaction_query: Query<
         (
             &Interaction,
-            // in 0.14, BackgroundColor is no longer used for tinting
-            // https://github.com/bevyengine/bevy/pull/11165
             &mut BackgroundColor,
             &Children,
         ),
@@ -127,29 +135,17 @@ impl<T: Into<String> + Send + 'static> Command
                 .expect("expect space sheet to have loaded")
         };
 
-        // TODO: TextureAtlas Panel Slicers? Does it work?
-        // let panel_slicer = TextureSlicer {
-        //     border: BorderRect::square(10.0),
-        //     center_scale_mode: SliceScaleMode::Stretch,
-        //     sides_scale_mode: SliceScaleMode::Stretch,
-        //     max_corner_scale: 1.0,
-        // };
-
         world
             .spawn((
                 ButtonBundle {
                     style: Style {
                         width: Val::Percent(100.0),
                         height: Val::Px(65.0),
-
-                        // horizontally center child text
                         justify_content:
                             JustifyContent::Center,
-                        // vertically center child text
                         align_items: AlignItems::Center,
                         ..default()
                     },
-                    // background_color: NORMAL_BUTTON.into(),
                     image: space_sheet.sheet.clone().into(),
                     ..default()
                 },
@@ -159,9 +155,6 @@ impl<T: Into<String> + Send + 'static> Command
                         .texture_atlas_layout
                         .clone(),
                 },
-                // ImageScaleMode::Sliced(
-                //     panel_slicer.clone(),
-                // ),
                 TextButton,
             ))
             .set_parent(self.parent)

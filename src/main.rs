@@ -2,14 +2,11 @@ use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 
 mod utils;
-use crate::utils::{
-    asset_loader::AssetsPlugin,
-    kenney_asset::KenneyAssetPlugin
-};   
-
 mod gameui;
-use crate::gameui::menu::MainMenuPlugin;
-
+use crate::{utils::asset_loader::AssetsPlugin,
+    gameui::settings::SettingsPlugin,
+    gameui::menu::MainMenuPlugin
+};   
 
 #[derive(
     Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States,
@@ -25,12 +22,12 @@ pub enum GameState {
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(
-            0., 0., 0.1,
+            0.078, 0.082, 0.188,
         )))
         .add_plugins((
             DefaultPlugins.set(WindowPlugin {
                 primary_window: Some(Window {
-                    title: "Asteroids!".into(),
+                    title: "Space Miner".into(),
                     ..default()
                 }),
                 ..default()
@@ -39,6 +36,7 @@ fn main() {
             PhysicsDebugPlugin::default(),
 
             AssetsPlugin,
+            SettingsPlugin,
             MainMenuPlugin,
         ))
         .init_state::<GameState>()

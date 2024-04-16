@@ -4,20 +4,23 @@ use crate::{
     utils::asset_loader::{
         FontAssets,
         ImageAssets,
+        AudioAssets,
     },
     GameState,
 }; 
 
-use crate::gameui::button::SpawnButton;
+use crate::gameui::{
+    button::SpawnButton,button::MenuPage, 
+    button::text_button_system,
+    settings::{AudioSettings, GameSettings},
+};
 
 #[derive(Component)]
 pub struct MainMenu;
 
-#[derive(Resource, Component, Debug, PartialEq)]
-pub enum MenuPage {
-    Main,
-    Settings,
-}
+#[derive(Component)]
+pub struct AudioSettingsCheckbox;
+
 
 pub struct MainMenuPlugin;
 impl Plugin for MainMenuPlugin {
@@ -31,9 +34,20 @@ impl Plugin for MainMenuPlugin {
             OnEnter(GameState::Menu),
             show_menu
         )
+        .add_systems(Update,
+            text_button_system
+            .run_if(not(in_state(GameState::AssetLoading)))
+        )
         .add_systems(
             OnExit(GameState::Menu), 
             hide_menu
+        )            
+        .add_systems(Update,
+            (
+                change_menu,
+                audio_state,
+            )
+                .run_if(in_state(GameState::Menu)),
         );
     }
 }
@@ -155,7 +169,91 @@ pub fn main_menu(
                                 ..default()
                             },
                             ..default()
+                        })
+                        .with_children(|parent| {
+                            parent.spawn((
+                                ButtonBundle {
+                                    style: Style {
+                                        width: Val::Px(25.0),
+                                        height: Val::Px(25.0),
+                                        margin:
+                                            UiRect::right(
+                                                Val::Px(
+                                                    10.0,
+                                                ),
+                                            ),
+                                        ..default()
+                                    },
+                                    image: UiImage::new(
+                                        images
+                                            .box_checked
+                                            .clone(),
+                                    ),
+                                    ..default()
+                                },
+                                AudioSettingsCheckbox,
+                            ));
+                            parent.spawn(
+                                TextBundle::from_section(
+                                    "Play Audio",
+                                    TextStyle {
+                                        font: fonts.roboto.clone(),
+                                        font_size: 25.0,
+                                        color: Color::BLACK,
+                                    },
+                                ),
+                            );
                         });
+
                 });
         });
+}
+
+fn change_menu(
+    menu: Res<MenuPage>,
+    mut menu_pages: Query<(&MenuPage, &mut Visibility)>,
+) {
+    if menu.is_changed() {
+        for (page, mut visibility) in menu_pages.iter_mut()
+        {
+            if page == &*menu {
+                *visibility = Visibility::Inherited;
+            } else {
+                *visibility = Visibility::Hidden;
+            }
+        }
+    }
+}
+
+fn audio_state(
+    commands: Commands,
+    mut interaction_query: Query<
+        (&Interaction, &mut UiImage),
+        (
+            Changed<Interaction>,
+            With<Button>,
+            With<AudioSettingsCheckbox>,
+        ),
+    >,
+    images: Res<ImageAssets>,
+    mut settings: ResMut<GameSettings>,
+    sounds: Res<AudioAssets>,
+) {
+    for (interaction, mut image) in &mut interaction_query {
+        if interaction == &Interaction::Pressed {
+            //if settings.audio == AudioSettings::ON {}
+            settings.audio = match settings.audio {
+                AudioSettings::ON => AudioSettings::OFF,
+                AudioSettings::OFF => AudioSettings::ON,
+            };
+            *image = UiImage::new(match settings.audio {
+                AudioSettings::ON => {
+                    images.box_checked.clone()
+                }
+                AudioSettings::OFF => {
+                    images.box_unchecked.clone()
+                }
+            });
+        }
+    }
 }
