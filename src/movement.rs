@@ -50,7 +50,7 @@ pub struct Rotate2D {
     pub axis: Vec3,
 }
 
-fn rotate_2d(
+pub fn rotate_2d(
     mut rotatables: Query<(&Rotate2D, &mut Transform)>,
     time: Res<Time>,
 ) {
@@ -62,7 +62,7 @@ fn rotate_2d(
 #[derive(Component)]
 pub struct MovementWrapper;
 
-fn wrapping_movement(
+pub fn wrapping_movement(
     mut wrappers: Query<
         &mut Transform,
         With<MovementWrapper>,

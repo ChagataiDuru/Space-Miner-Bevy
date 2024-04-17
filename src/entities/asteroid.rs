@@ -4,12 +4,8 @@ use bevy_xpbd_2d::prelude::*;
 use rand::prelude::*;
 
 use crate::{
-    utils::{
-        asset_loader::ImageAssets,
-        kenney_asset::KenneySpriteSheetAsset,
-    },
+    utils::kenney_asset::KenneySpriteSheetAsset,
     movement::{LinearMovement, Rotate2D, MovementWrapper},
-    GameState,
 };
 
 
@@ -76,7 +72,7 @@ impl MeteorBundle {
                     rotation,
                 ),
             },
-            spin: Rotate2D(1.3),
+            spin: Rotate2D { speed: 1.2, axis: Vec3::Z },
             wrapping: MovementWrapper,
         }
     }
@@ -112,7 +108,7 @@ impl MeteorBundle {
                     rotation,
                 ),
             },
-            spin: Rotate2D(1.6),
+            spin: Rotate2D { speed: 1.6, axis: Vec3::Z },
             wrapping: MovementWrapper,
         }
     }
@@ -148,7 +144,7 @@ impl MeteorBundle {
                     rotation,
                 ),
             },
-            spin: Rotate2D(2.),
+            spin: Rotate2D { speed: 2., axis: Vec3::Z },
             wrapping: MovementWrapper,
         }
     }
