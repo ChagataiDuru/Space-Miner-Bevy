@@ -6,11 +6,23 @@ mod gameui;
 mod movement;
 mod entities;
 use crate::{
-    utils::asset_loader::AssetsPlugin,
+    utils::{
+        asset_loader::AssetsPlugin,
+        asset_loader::ImageAssets, 
+        kenney_asset::KenneySpriteSheetAsset
+    },
     gameui::settings::SettingsPlugin,
     gameui::menu::MainMenuPlugin,
     movement::MovementPlugin,
-    entities::spaceship::ShipPlugin,
+    movement::MovementWrapper,
+    entities::{
+        spaceship::ShipPlugin,
+        spaceship::ShipBundle,
+        spaceship::ShipLevels,
+        asteroid::MeteorPlugin,
+        asteroid::MeteorBundle,
+
+    }
 };   
 
 #[derive(
@@ -47,12 +59,42 @@ fn main() {
             MainMenuPlugin,
             MovementPlugin,
             ShipPlugin,
+            MeteorPlugin,
         ))
         .init_state::<GameState>()
         .add_systems(Startup, setup)
+        .add_systems(OnEnter(GameState::Playing), test_game_start)
         .run();
 }
 
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
+}
+
+fn test_game_start(
+    mut commands: Commands,
+    images: Res<ImageAssets>,
+    sheets: Res<Assets<KenneySpriteSheetAsset>>
+){
+    let space_sheet = sheets.get(&images.space_sheet).unwrap();
+    commands.spawn(ShipBundle {
+        sprite_bundle: SpriteBundle {
+            texture: space_sheet.sheet.clone(),
+            ..default()
+        },
+        texture_atlas: TextureAtlas {
+            index: 200,
+            layout: space_sheet
+                    .texture_atlas_layout
+                    .clone(),
+        },
+        player: Player,
+        ship_type: ShipLevels::Initial,
+        collider: Collider::circle(32.),
+        wrapping_movement: MovementWrapper
+    });
+    commands.spawn(MeteorBundle::big(
+        Transform::from_xyz(50., 0., 1.),
+        &space_sheet,
+    ));
 }
