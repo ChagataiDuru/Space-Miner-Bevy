@@ -5,6 +5,7 @@ mod utils;
 mod gameui;
 mod movement;
 mod entities;
+mod controller;
 use crate::{
     utils::{
         asset_loader::AssetsPlugin,
@@ -21,8 +22,8 @@ use crate::{
         spaceship::ShipLevels,
         asteroid::MeteorPlugin,
         asteroid::MeteorBundle,
-
-    }
+    },
+    controller::ControlsPlugin,
 };   
 
 #[derive(
@@ -60,6 +61,7 @@ fn main() {
             MovementPlugin,
             ShipPlugin,
             MeteorPlugin,
+            ControlsPlugin,
         ))
         .init_state::<GameState>()
         .add_systems(Startup, setup)
