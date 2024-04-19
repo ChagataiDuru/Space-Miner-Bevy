@@ -2,18 +2,17 @@ use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 
 use crate::{
-    utils::{
-    asset_loader::ImageAssets, 
-    kenney_asset::KenneySpriteSheetAsset
-    },
     movement::MovementWrapper,
-    GameState,Player
+    Player
 }; 
 
 pub struct ShipPlugin;
 
 impl Plugin for ShipPlugin {
-    fn build(&self, app: &mut App) {}
+    fn build(&self, app: &mut App) {
+        app
+            .add_event::<ShipDestroyed>();
+    }
 }
 
 #[derive(Bundle)]
@@ -80,4 +79,9 @@ impl ShipLevels {
             },
         }
     }
+}
+
+#[derive(Event)]
+pub struct ShipDestroyed {
+    pub destroyed_at: Transform,
 }

@@ -1,2 +1,3 @@
+pub mod collisions;
 pub mod spaceship;
-pub mod asteroid;
+pub mod meteor;

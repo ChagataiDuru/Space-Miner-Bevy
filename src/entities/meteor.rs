@@ -12,7 +12,10 @@ use crate::{
 pub struct MeteorPlugin;
 
 impl Plugin for MeteorPlugin {
-    fn build(&self, app: &mut App) {}
+    fn build(&self, app: &mut App) {
+        app
+            .add_event::<MeteorDestroyed>();
+    }
 }
 
 #[derive(Bundle)]
@@ -148,4 +151,10 @@ impl MeteorBundle {
             wrapping: MovementWrapper,
         }
     }
+}
+
+#[derive(Event)]
+pub struct MeteorDestroyed {
+    pub destroyed_at: Transform,
+    pub destroyed_type: MeteorType,
 }

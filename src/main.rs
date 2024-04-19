@@ -12,6 +12,7 @@ use crate::{
         asset_loader::ImageAssets, 
         kenney_asset::KenneySpriteSheetAsset,
         pause_system::PausePlugin,
+        pause_system::Pausable,
     },
     gameui::settings::SettingsPlugin,
     gameui::menu::MainMenuPlugin,
@@ -21,8 +22,10 @@ use crate::{
         spaceship::ShipPlugin,
         spaceship::ShipBundle,
         spaceship::ShipLevels,
-        asteroid::MeteorPlugin,
-        asteroid::MeteorBundle,
+        meteor::MeteorPlugin,
+        meteor::MeteorBundle,
+        collisions::laser_meteor_collision,
+        collisions::ship_meteor_collision,
     },
     controller::ControlsPlugin,
 };   
@@ -68,11 +71,22 @@ fn main() {
         .init_state::<GameState>()
         .add_systems(Startup, setup)
         .add_systems(OnEnter(GameState::Playing), test_game_start)
+        .add_systems(
+            Update,
+            (
+                laser_meteor_collision,
+                ship_meteor_collision,
+            )
+                .run_if(in_state(GameState::Playing))
+                .run_if(resource_equals(
+                    Pausable::NotPaused,
+                )),
+        )
         .run();
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle::default()); 
 }
 
 fn test_game_start(
@@ -98,7 +112,7 @@ fn test_game_start(
         wrapping_movement: MovementWrapper
     });
     commands.spawn(MeteorBundle::big(
-        Transform::from_xyz(50., 0., 1.),
+        Transform::from_xyz(50., 100., 1.),
         &space_sheet,
     ));
 }
