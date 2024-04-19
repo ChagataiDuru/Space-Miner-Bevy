@@ -3,12 +3,11 @@ use bevy_xpbd_2d::prelude::*;
 use std::time::Duration;
 
 use crate::{
-    utils::{
+    entities::spaceship::ShipLevels, utils::{
         asset_loader::ImageAssets, 
-        kenney_asset::KenneySpriteSheetAsset
-    },
-    entities::spaceship::ShipLevels,
-    GameState,Player
+        kenney_asset::KenneySpriteSheetAsset, 
+        pause_system::Pausable
+    }, GameState, Player
 };   
 
 #[derive(Component)]
@@ -32,9 +31,9 @@ impl Plugin for ControlsPlugin {
                 //    .run_if(in_state(GameState::Playing)),
                 laser_movement,
             )
-                //.run_if(resource_equals(
-                //    Pausable::NotPaused,
-                //)),
+                .run_if(resource_equals(
+                    Pausable::NotPaused,
+                )),
         );
     }
 }

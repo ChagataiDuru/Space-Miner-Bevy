@@ -10,7 +10,8 @@ use crate::{
     utils::{
         asset_loader::AssetsPlugin,
         asset_loader::ImageAssets, 
-        kenney_asset::KenneySpriteSheetAsset
+        kenney_asset::KenneySpriteSheetAsset,
+        pause_system::PausePlugin,
     },
     gameui::settings::SettingsPlugin,
     gameui::menu::MainMenuPlugin,
@@ -58,6 +59,7 @@ fn main() {
             AssetsPlugin,
             SettingsPlugin,
             MainMenuPlugin,
+            PausePlugin,
             MovementPlugin,
             ShipPlugin,
             MeteorPlugin,
