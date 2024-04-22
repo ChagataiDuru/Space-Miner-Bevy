@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-//use crate::ui::pause::Pausable;
+use crate::utils::pause_system::Pausable;
 
 pub struct MovementPlugin;
 
@@ -9,9 +9,9 @@ impl Plugin for MovementPlugin {
         app.add_systems(
             Update,
             (linear_movement, rotate_2d, wrapping_movement)
-                //.run_if(resource_equals(
-                //    Pausable::NotPaused,
-                //)),
+                .run_if(resource_equals(
+                    Pausable::NotPaused,
+                )),
         );
     }
 }

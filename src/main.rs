@@ -20,6 +20,7 @@ use crate::{
     movement::MovementPlugin,
     movement::MovementWrapper,
     entities::{
+        lives::LifePlugin,
         spaceship::ShipPlugin,
         spaceship::ShipBundle,
         spaceship::ShipLevels,
@@ -68,6 +69,7 @@ fn main() {
             PausePlugin,
             MovementPlugin,
             ShipPlugin,
+            LifePlugin,
             MeteorPlugin,
             ControlsPlugin,
         ))
