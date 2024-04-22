@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
+use bevy_hanabi::prelude::*;
 
 mod utils;
 mod gameui;
