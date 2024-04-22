@@ -15,6 +15,9 @@ impl Plugin for ShipPlugin {
     }
 }
 
+#[derive(Component)]
+pub struct EngineFire;
+
 #[derive(Bundle)]
 pub struct ShipBundle {
     pub sprite_bundle: SpriteBundle,

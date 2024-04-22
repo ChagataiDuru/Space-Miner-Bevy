@@ -3,7 +3,9 @@ use bevy_xpbd_2d::prelude::*;
 use std::time::Duration;
 
 use crate::{
-    entities::spaceship::ShipLevels, utils::{
+    entities::spaceship::ShipLevels,
+    entities::spaceship::EngineFire, 
+    utils::{
         asset_loader::ImageAssets, 
         kenney_asset::KenneySpriteSheetAsset, 
         pause_system::Pausable
@@ -38,10 +40,10 @@ impl Plugin for ControlsPlugin {
     }
 }
 
-/* fn engine_fire(
+fn engine_fire(
     mut query: Query<
         &mut Visibility,
-        With<PlayerEngineFire>,
+        With<EngineFire>,
     >,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
@@ -54,7 +56,7 @@ impl Plugin for ControlsPlugin {
             *visibility = Visibility::Hidden;
         }
     }
-} */
+}
 
 const ROTATION_SPEED: f32 = 1.0;
 const MOVEMENT_SPEED: f32 = 0.01;

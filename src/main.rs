@@ -23,6 +23,7 @@ use crate::{
         spaceship::ShipPlugin,
         spaceship::ShipBundle,
         spaceship::ShipLevels,
+        spaceship::EngineFire,
         meteor::MeteorPlugin,
         meteor::MeteorBundle,
         collisions::laser_meteor_collision,
@@ -96,6 +97,29 @@ fn test_game_start(
     sheets: Res<Assets<KenneySpriteSheetAsset>>
 ){
     let space_sheet = sheets.get(&images.space_sheet).unwrap();
+    let engine_fire = commands
+    .spawn((
+        SpriteBundle {
+            transform: Transform::from_xyz(
+                0., -60., 1.,
+            ),
+            texture: space_sheet.sheet.clone(),
+            sprite: Sprite {
+                flip_y: true,
+                ..default()
+            },
+            visibility: Visibility::Hidden,
+            ..default()
+        },
+        TextureAtlas {
+            index: 74,
+            layout: space_sheet
+                .texture_atlas_layout
+                .clone(),
+        },
+        EngineFire,
+    ))
+    .id();
     commands.spawn(ShipBundle {
         sprite_bundle: SpriteBundle {
             texture: space_sheet.sheet.clone(),
@@ -111,7 +135,8 @@ fn test_game_start(
         ship_type: ShipLevels::Initial,
         collider: Collider::circle(32.),
         wrapping_movement: MovementWrapper
-    });
+    })
+    .add_child(engine_fire);
     commands.spawn(MeteorBundle::big(
         Transform::from_xyz(50., 100., 1.),
         &space_sheet,
