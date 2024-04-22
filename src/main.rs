@@ -60,6 +60,7 @@ fn main() {
             }),
             PhysicsPlugins::default(),
             PhysicsDebugPlugin::default(),
+            HanabiPlugin,
 
             AssetsPlugin,
             SettingsPlugin,
@@ -120,6 +121,52 @@ fn test_game_start(
         EngineFire,
     ))
     .id();
+    let right_truster = commands
+    .spawn((
+        SpriteBundle {
+            transform: Transform::from_xyz(
+                16., -40., 1.,
+            ),
+            texture: space_sheet.sheet.clone(),
+            sprite: Sprite {
+                flip_y: true,
+                ..default()
+            },
+            visibility: Visibility::Hidden,
+            ..default()
+        },
+        TextureAtlas {
+            index: 75,
+            layout: space_sheet
+                .texture_atlas_layout
+                .clone(),
+        },
+        EngineFire,
+    ))
+    .id();
+    let left_truster = commands
+    .spawn((
+        SpriteBundle {
+            transform: Transform::from_xyz(
+                -16., -40., 1.,
+            ),
+            texture: space_sheet.sheet.clone(),
+            sprite: Sprite {
+                flip_y: true,
+                ..default()
+            },
+            visibility: Visibility::Hidden,
+            ..default()
+        },
+        TextureAtlas {
+            index: 75,
+            layout: space_sheet
+                .texture_atlas_layout
+                .clone(),
+        },
+        EngineFire,
+    ))
+    .id();
     commands.spawn(ShipBundle {
         sprite_bundle: SpriteBundle {
             texture: space_sheet.sheet.clone(),
@@ -136,7 +183,9 @@ fn test_game_start(
         collider: Collider::circle(32.),
         wrapping_movement: MovementWrapper
     })
-    .add_child(engine_fire);
+    .add_child(engine_fire)
+    .add_child(right_truster)
+    .add_child(left_truster);
     commands.spawn(MeteorBundle::big(
         Transform::from_xyz(50., 100., 1.),
         &space_sheet,

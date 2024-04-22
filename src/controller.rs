@@ -29,8 +29,8 @@ impl Plugin for ControlsPlugin {
                     .run_if(in_state(GameState::Playing)),
                 weapon_system
                     .run_if(in_state(GameState::Playing)),
-                //engine_fire
-                //    .run_if(in_state(GameState::Playing)),
+                engine_fire
+                    .run_if(in_state(GameState::Playing)),
                 laser_movement,
             )
                 .run_if(resource_equals(

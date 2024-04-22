@@ -1,22 +1,101 @@
 use std::f32::consts::TAU;
+
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
+use bevy_hanabi::prelude::*;
+
 use rand::prelude::*;
 
 use crate::{
-    utils::kenney_asset::KenneySpriteSheetAsset,
-    movement::{LinearMovement, Rotate2D, MovementWrapper},
+    movement::{LinearMovement, MovementWrapper, Rotate2D}, 
+    utils::{asset_loader::ImageAssets, kenney_asset::KenneySpriteSheetAsset, pause_system::Pausable},
+    GameState,
 };
 
 
 pub struct MeteorPlugin;
-
 impl Plugin for MeteorPlugin {
     fn build(&self, app: &mut App) {
-        app
+        app.add_systems(Startup, register_meteor_effect)
+            .add_systems(
+                PostUpdate,
+                sandbox_meteor_destroyed_event_handler
+                    .run_if(resource_equals(
+                        Pausable::NotPaused,
+                    ))
+                    .run_if(in_state(GameState::Playing)),
+            )
             .add_event::<MeteorDestroyed>();
     }
 }
+
+fn register_meteor_effect(
+    mut commands: Commands,
+    mut effects: ResMut<Assets<EffectAsset>>,
+) {
+    let spawner = Spawner::once(100.0.into(), false);
+
+    let writer = ExprWriter::new();
+
+    let age = writer.lit(0.).expr();
+    let init_age =
+        SetAttributeModifier::new(Attribute::AGE, age);
+    let lifetime = writer.lit(1.5).expr();
+    let init_lifetime = SetAttributeModifier::new(
+        Attribute::LIFETIME,
+        lifetime,
+    );
+
+    let drag = writer.lit(2.).expr();
+    let update_drag = LinearDragModifier::new(drag);
+
+    let color = writer.prop("spawn_color").expr();
+    let init_color =
+        SetAttributeModifier::new(Attribute::COLOR, color);
+
+    let init_pos = SetPositionCircleModifier {
+        center: writer.lit(Vec3::Y).expr(),
+        axis: writer.lit(Vec3::Z).expr(),
+        radius: writer.lit(TAU).expr(),
+        dimension: ShapeDimension::Surface,
+    };
+
+    let init_vel = SetVelocityCircleModifier {
+        center: writer.lit(Vec3::ZERO).expr(),
+        axis: writer.lit(Vec3::Z).expr(),
+        speed: (writer.lit(200.)
+            * writer.rand(ScalarType::Float))
+        .expr(),
+    };
+
+    let effect = effects.add(
+        EffectAsset::new(32768, spawner, writer.finish())
+            .with_name("explosion")
+            .with_property(
+                "spawn_color",
+                0xFFFFFFFFu32.into(),
+            )
+            .init(init_pos)
+            .init(init_vel)
+            .init(init_age)
+            .init(init_lifetime)
+            .init(init_color)
+            .update(update_drag)
+            .render(SetSizeModifier {
+                size: Vec2::splat(3.).into(),
+                screen_space_size: true,
+            }),
+    );
+
+    commands
+        .spawn((
+            ParticleEffectBundle::new(effect)
+                .with_spawner(spawner),
+            EffectProperties::default(),
+        ))
+        .insert(Name::new("effect:meteor_explosion"));
+}
+
 
 #[derive(Bundle)]
 pub struct MeteorBundle {
@@ -157,4 +236,101 @@ impl MeteorBundle {
 pub struct MeteorDestroyed {
     pub destroyed_at: Transform,
     pub destroyed_type: MeteorType,
+}
+
+fn sandbox_meteor_destroyed_event_handler(
+    mut commands: Commands,
+    images: Res<ImageAssets>,
+    mut events: EventReader<MeteorDestroyed>,
+    // meteors: Query<Entity, With<MeteorType>>,
+    sheets: Res<Assets<KenneySpriteSheetAsset>>,
+    mut effect: Query<(
+        &mut EffectProperties,
+        &mut EffectSpawner,
+        &mut Transform,
+    )>,
+) {
+    let Some(space_sheet) = sheets.get(&images.space_sheet)
+    else {
+        warn!("sandbox_meteor_destroyed_event_handler requires meteor sprites to be loaded");
+        return;
+    };
+
+    let mut rng = rand::thread_rng();
+    // Note: On first frame where the effect spawns,
+    // EffectSpawner is spawned during PostUpdate,
+    // so will not be available yet. Ignore for a
+    // frame if so.
+    let Ok((
+        mut properties,
+        mut spawner,
+        mut effect_transform,
+    )) = effect.get_single_mut()
+    else {
+        warn!("effect not ready yet, returning");
+        return;
+    };
+
+    for MeteorDestroyed {
+        destroyed_at,
+        destroyed_type,
+    } in &mut events.read()
+    {
+        effect_transform.translation =
+            destroyed_at.translation;
+
+        let color = Color::lch(
+            1.,
+            1.,
+            rand::random::<f32>() * 360.,
+        );
+        properties.set(
+            "spawn_color",
+            color.as_linear_rgba_u32().into(),
+        );
+
+        // Spawn the particles
+        spawner.reset();
+
+        match destroyed_type {
+            MeteorType::Big => {
+                // become two medium
+                for _ in 0..2 {
+                    let x: i32 = rng.gen_range(-5..5);
+                    let y: i32 = rng.gen_range(-5..5);
+                    commands.spawn(MeteorBundle::medium(
+                        Transform::from_xyz(
+                            destroyed_at.translation.x
+                                + x as f32,
+                            destroyed_at.translation.y
+                                + y as f32,
+                            1.,
+                        ),
+                        space_sheet,
+                    ));
+                }
+            }
+            MeteorType::Medium => {
+                // become two smol
+                for _ in 0..2 {
+                    let x: i32 = rng.gen_range(-5..5);
+                    let y: i32 = rng.gen_range(-5..5);
+                    commands.spawn(MeteorBundle::small(
+                        Transform::from_xyz(
+                            destroyed_at.translation.x
+                                + x as f32,
+                            destroyed_at.translation.y
+                                + y as f32,
+                            1.,
+                        ),
+                        space_sheet,
+                    ));
+                }
+            }
+            MeteorType::Small => {
+                // small meteors don't propogate
+                // more meteors
+            }
+        }
+    }
 }
