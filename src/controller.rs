@@ -3,13 +3,11 @@ use bevy_xpbd_2d::prelude::*;
 use std::time::Duration;
 
 use crate::{
-    entities::spaceship::ShipLevels,
-    entities::spaceship::EngineFire, 
-    utils::{
+    entities::spaceship::{EngineFire, ShipLevels}, utils::{
         asset_loader::ImageAssets, 
         kenney_asset::KenneySpriteSheetAsset, 
         pause_system::Pausable
-    }, GameState, Player
+    }, CameraFollowsPlayer, GameState, Player
 };   
 
 #[derive(Component)]
@@ -26,7 +24,8 @@ impl Plugin for ControlsPlugin {
             Update,
             (
                 player_movement_system
-                    .run_if(in_state(GameState::Playing)),
+                    .run_if(in_state(GameState::Playing))
+                    .before(camera_follows_player_system),
                 weapon_system
                     .run_if(in_state(GameState::Playing)),
                 engine_fire
@@ -110,6 +109,21 @@ fn player_movement_system(
 
     }
 }
+
+fn camera_follows_player_system(
+    mut camera_query: Query<(&mut Transform, &CameraFollowsPlayer)>,
+    player_query: Query<(&Player, &Transform)>,
+) {
+    if let Ok((_, player_transform)) = player_query.get_single() {
+        if let Ok((mut camera_transform, _)) = camera_query.get_single_mut() {
+            debug!("Camera:{:?}, Player:{:?}", camera_transform, player_transform);
+            camera_transform.translation.x = player_transform.translation.x;
+            camera_transform.translation.y = player_transform.translation.y;
+            debug!("Camera following player")
+        }
+    }
+}
+
 
 fn laser_movement(
     mut lasers: Query<(&mut Transform, &Laser)>,

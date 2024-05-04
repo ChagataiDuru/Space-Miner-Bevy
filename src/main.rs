@@ -1,6 +1,7 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, render::camera::{self, ScalingMode}, transform::commands};
 use bevy_xpbd_2d::prelude::*;
 use bevy_hanabi::prelude::*;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 mod utils;
 mod gameui;
@@ -18,7 +19,7 @@ use crate::{
     gameui::settings::SettingsPlugin,
     gameui::menu::MainMenuPlugin,
     movement::MovementPlugin,
-    movement::MovementWrapper,
+    //movement::MovementWrapper,
     entities::{
         lives::LifePlugin,
         spaceship::ShipPlugin,
@@ -61,6 +62,7 @@ fn main() {
             }),
             PhysicsPlugins::default(),
             PhysicsDebugPlugin::default(),
+            WorldInspectorPlugin::new(),
             HanabiPlugin,
 
             AssetsPlugin,
@@ -74,7 +76,7 @@ fn main() {
             ControlsPlugin,
         ))
         .init_state::<GameState>()
-        .add_systems(Startup, setup)
+        .add_systems(Startup, setup_camera)
         .add_systems(OnEnter(GameState::Playing), test_game_start)
         .add_systems(
             Update,
@@ -90,14 +92,17 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default()); 
-}
+#[derive(Component)]
+pub struct CameraFollowsPlayer;
 
+fn setup_camera(mut commands: Commands) {
+    let mut camera_bundle = Camera2dBundle::default();
+    commands.spawn(camera_bundle).insert(CameraFollowsPlayer);
+}
 fn test_game_start(
     mut commands: Commands,
     images: Res<ImageAssets>,
-    sheets: Res<Assets<KenneySpriteSheetAsset>>
+    sheets: Res<Assets<KenneySpriteSheetAsset>>,
 ){
     let space_sheet = sheets.get(&images.space_sheet).unwrap();
     let engine_fire = commands
@@ -183,7 +188,7 @@ fn test_game_start(
         player: Player,
         ship_type: ShipLevels::Initial,
         collider: Collider::circle(32.),
-        wrapping_movement: MovementWrapper
+        //wrapping_movement: MovementWrapper
     })
     .add_child(engine_fire)
     .add_child(right_truster)

@@ -44,7 +44,7 @@ pub struct ShipBundle {
     pub player: Player,
     pub ship_type: ShipLevels,
     pub collider: Collider,
-    pub wrapping_movement: MovementWrapper,
+    //pub wrapping_movement: MovementWrapper,
 }
 
 #[derive(Resource, Component, Clone)]
@@ -259,7 +259,7 @@ fn spawn_ship_after_ship_destroyed(
         player: Player,
         ship_type: ShipLevels::Initial,
         collider: Collider::circle(32.),
-        wrapping_movement: MovementWrapper
+        //wrapping_movement: MovementWrapper
     })
     .add_child(engine_fire)
     .add_child(right_truster)
